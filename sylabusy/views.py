@@ -1,11 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.views.generic import TemplateView
 
-# Create your views here.
-def index(request):
-    # return HttpResponse("Hello, world. You're at the polls index.")
-    context = {
-        'majors': ['Computer Science', 'Mechanical Engineering', 'Architecture'],
-        'university': 'Bialystok University of Technology'
-    }
-    return render(request, 'sylabusy/index.html', context)
+
+class IndexView(TemplateView):
+    template_name = 'sylabusy/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['university'] = 'Bialystok University of Technology'
+
+        return context

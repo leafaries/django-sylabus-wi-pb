@@ -1,20 +1,104 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang={{ LANGUAGE_CODE }}>
 <head>
-    <title>University Syllabus</title>
+    <title>PB Sylabus</title>
 </head>
 <body>
-    <nav></nav>
+{{ LANGUAGE_CODE }}
+    <nav>
+        <div class="language-switcher">
+            <a href="{{ request.path|slice:'3:'|default:'/' }}">PL</a>
+            |
+            <a href="/en{{ requst.path }}/">EN</a>
+        </div>
+        <a href="/">Sylabus PB {% if LANGUAGE_CODE|slice:":2" == "en" %}Bialystok University of Technology{% endif %}</a>
+    </nav>
     <main>
-        <h1>Plans for {{ university }}</h1>
-        <ul>
-            {% for major in majors %}
-                <li>{{ major }}</li>
-            {% endfor %}
-        </ul>
+        <nav id="main-menu">
+            <form action="/{{ LANGUAGE_CODE }}/search"></form>
+            <div class="syl-filter-box">
+                <div class="syl-filter-box-head">
+                    {% trans "Oferta PB" %}
+                </div>
+                <hr>
+                <ul>
+                    <li>{% trans "Wydziały" %}</li>
+                    <li>{% trans "Dyscypliny" %}</li>
+                    <li>{% trans "Uczelniana Baza Przedmiotów obieralnych" %}</li>
+                </ul>
+            </div>
+            <div class="syl-filter-box">
+                <div class="syl-filter-box-head">
+                    {% trans "Rozpoczęcie studiów" %}
+                </div>
+                <hr>
+                <ul>
+                    <li>{% trans "2021/2022" %}</li>
+                    <li>{% trans "2022/2023" %}</li>
+                    <li>{% trans "2023/2024" %}</li>
+                    <li>{% trans "2024/2025" %}</li>
+                    <li>{% trans "2025/2026" %}</li>
+                </ul>
+            </div>
+            <div class="syl-filter-box">
+                <div class="syl-filter-box-head">
+                    {% trans "Poziom kształcenia" %}
+                </div>
+                <hr>
+                <ul>
+                    <li>{% trans "Wszystkie" %}</li>
+                    <li>{% trans "Studia inżynierskie I stopnia" %}</li>
+                    <li>{% trans "Studia magisterskie II stopnia" %}</li>
+                </ul>
+            </div>
+            <div class="syl-filter-box">
+                <div class="syl-filter-box-head">
+                    {% trans "Forma studiów" %}
+                </div>
+            </div>
+            <hr>
+            <ul>
+                <li>{% trans "Wszystkie" %}</li>
+                <li>{% trans "Stacjonarne" %}</li>
+                <li>{% trans "Niestacjonarne" %}</li>
+            </ul>
+        </nav>
+        <section class="main-content">
+            <h1 class="section-title">
+                {% trans "Lista Wydziałów" %}
+            </h1>
+            <div class="section-subtitle">
+                2026/2027
+            </div>
+            <div class="section-body">
+                <div class="section-row">
+                    <div class="section-row-element">
+                        <a>{% trans "Wydział Architektury (WA)" %}</a>
+                    </div>
+                    <div class="section-row-element">
+                        <a>{% trans "Wydział Budownictwa i Nauk o Środowisku (WBiNŚ)" %}</a>
+                    </div>
+                    <div class="section-row-element">
+                        <a>{% trans "Wydział Elektryczny (WE)" %}</a>
+                    </div>
+                </div>
+                <div class="section-row">
+                    <div class="section-row-element">
+                        <a>{% trans "Wydział Informatyki (WI)" %}</a>
+                    </div>
+                    <div class="section-row-element">
+                        <a>{% trans "Wydział Inżynierii Zarządzania (WIZ)" %}</a>
+                    </div>
+                    <div class="section-row-element">
+                        <a>{% trans "Wydział Mechaniczny (WM)" %}</a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
     <footer>
-        <p></p>
+        FOOTER
     </footer>
 </body>
 </html>
