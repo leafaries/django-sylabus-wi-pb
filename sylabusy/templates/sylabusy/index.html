@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>University Syllabus</title>
+</head>
+<body>
+    <nav></nav>
+    <main>
+        <h1>Plans for {{ university }}</h1>
+        <ul>
+            {% for major in majors %}
+                <li>{{ major }}</li>
+            {% endfor %}
+        </ul>
+    </main>
+    <footer>
+        <p></p>
+    </footer>
+</body>
+</html>
