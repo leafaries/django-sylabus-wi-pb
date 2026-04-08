@@ -33,8 +33,8 @@ pip install -r requirements.txt
 
 ```bash
 touch .env
-echo .env >> DEBUG=True
-echo .env >> SECRET_KEY=<paste-your-secret-key-here>
+echo DEBUG=True >> .env
+echo SECRET_KEY=<paste-your-secret-key-here> >> .env
 ```
 
 Remember to replace `<paste-your-secret-key-here>` with your own secret key.
