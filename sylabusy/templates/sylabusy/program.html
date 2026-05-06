@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ program.title }} - {{ university }}</title>
+    <link rel="stylesheet" href="{% static 'sylabusy/style.css' %}">
+    <script>
+        function switchSemester(index) {
+            const tabs = document.querySelectorAll('.tab-link');
+            const contents = document.querySelectorAll('.semester-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.style.display = 'none');
+            tabs[index].classList.add('active');
+            contents[index].style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a class="brand" href="/">Sylabusy Uczelni</a>
+            <nav>
+                <ul>
+                    <li><a href="/">Strona główna</a></li>
+                    <li><a href="{% url 'faculty_detail' faculty.slug %}">{{ faculty.name }}</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="breadcrumb">
+            <a href="/">Strona główna</a> ›
+            <a href="{% url 'faculty_detail' faculty.slug %}">{{ faculty.name }}</a> ›
+            <span>{{ program.title }}</span>
+        </div>
+        <h2 class="section-title">{{ program.title }}</h2>
+        <p class="program-meta">2026/2027, {{ program.detail }}</p>
+        <div class="tab-nav">
+            {% if program.semesters|first %}
+                <a href="#" class="tab-link active" onclick="switchSemester(0); return false;">Opis kierunku</a>
+                {% for semester in program.semesters %}
+                    <a href="#" class="tab-link" onclick="switchSemester({{ forloop.counter }}); return false;">{{ semester.name }}</a>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="semester-content" style="display: block;">
+            <p class="program-description">{{ program.description }}</p>
+        </div>
+
+        {% for semester in program.semesters %}
+            <div class="semester-content" style="display: none;">
+                {% if semester.subjects %}
+                    <h3 style="margin-top: 20px; margin-bottom: 10px;">Lista przedmiotów - {{ semester.name }} zimowy, 2026/2027</h3>
+                    <table class="subjects-table">
+                        <thead>
+                            <tr>
+                                <th>Przedmiot</th>
+                                <th>Liczba godzin</th>
+                                <th>Punkty ECTS</th>
+                                <th>Forma weryfikacji</th>
+                                <th>Obligatoryjność</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject in semester.subjects %}
+                                <tr>
+                                    <td>{{ subject.name }}</td>
+                                    <td>{{ subject.hours }}</td>
+                                    <td>{{ subject.ects }}</td>
+                                    <td>{{ subject.form }}</td>
+                                    <td>{{ subject.obligatory }}</td>
+                                </tr>
+                            {% endfor %}
+                            {% if semester.total_hours and semester.total_ects %}
+                            <tr class="sum-row">
+                                <td><strong>Suma</strong></td>
+                                <td>{{ semester.total_hours }}</td>
+                                <td><strong>{{ semester.total_ects }}</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>{{ semester.content }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </section>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>Akademicki system sylabusowy dla {{ university }}.</p>
+            <p><a href="{% url 'faculty_detail' faculty.slug %}" style="color: #d8e4ff;">Powrót do wydziału</a></p>
+        </div>
+    </footer>
+</body>
+</html>

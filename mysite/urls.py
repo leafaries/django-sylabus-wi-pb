@@ -22,4 +22,6 @@ from sylabusy import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    path('wydzial/<slug:slug>/', views.faculty_detail, name='faculty_detail'),
+    path('wydzial/<slug:faculty_slug>/<slug:program_slug>/', views.program_detail, name='program_detail'),
 ]

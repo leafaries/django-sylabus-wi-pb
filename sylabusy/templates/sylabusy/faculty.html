@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ faculty.name }} - {{ university }}</title>
+    <link rel="stylesheet" href="{% static 'sylabusy/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a class="brand" href="/">Sylabusy Uczelni</a>
+            <nav>
+                <ul>
+                    <li><a href="/">Strona główna</a></li>
+                    <li><a href="#programs">Kierunki</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <h2 class="section-title">{{ faculty.name }}</h2>
+        <p>{{ faculty.description }}</p>
+        <div class="card-grid" id="programs">
+            {% for program in faculty.programs %}
+                <article class="card">
+                    <h3>{{ program.title }}</h3>
+                    <p>{{ program.detail }}</p>
+                    <small><a class="program-link" href="{% url 'program_detail' faculty.slug program.slug %}">Studia inżynierskie I stopnia, Stacjonarne</a></small>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>Akademicki system sylabusowy dla {{ university }}.</p>
+            <p><a href="/" style="color: #d8e4ff;">Powrót na stronę główną</a></p>
+        </div>
+    </footer>
+</body>
+</html>
