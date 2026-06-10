@@ -9,6 +9,11 @@ def _build_faculties():
         'II': 'Studia magisterskie II stopnia',
         'podypl.': 'Studia podyplomowe',
     }
+    STOPIEN_BADGE = {
+        'I': 'I stopień',
+        'II': 'II stopień',
+        'podypl.': 'Podyplomowe',
+    }
     FORMA_MAP = {
         'st.': 'Stacjonarne',
         'niest.': 'Niestacjonarne',
@@ -44,6 +49,10 @@ def _build_faculties():
                 'detail': detail,
                 'description': description,
                 'semesters': semesters,
+                'stopien': studia.stopien,
+                'stopien_badge': STOPIEN_BADGE.get(studia.stopien, studia.stopien),
+                'forma': studia.forma or 'st.',
+                'forma_badge': FORMA_MAP.get(studia.forma or '', 'Stacjonarne'),
             })
 
         faculties.append({
@@ -72,6 +81,11 @@ def _build_semesters(studia):
         cykl=cykl
     ).select_related('nazwa', 'kategoria').order_by('sem', 'nazwa__nazwa')
 
+    SPECIAL_SEMESTERS = {
+        100: 'Przedmioty do wyboru',
+        400: 'Przedmioty dodatkowe',
+    }
+
     semesters_dict = {}
     for p in przedmioty:
         sem_nr = p.sem
@@ -89,8 +103,9 @@ def _build_semesters(studia):
     semesters = []
     for sem_nr in sorted(semesters_dict.keys()):
         subjects = semesters_dict[sem_nr]
+        name = SPECIAL_SEMESTERS.get(sem_nr, f'Semestr {sem_nr}')
         semesters.append({
-            'name': f'Semestr {sem_nr}',
+            'name': name,
             'content': '',
             'subjects': subjects,
             'total_ects': sum(s['ects'] for s in subjects),
@@ -101,6 +116,7 @@ def _build_semesters(studia):
 
 def index(request):
     faculties = _build_faculties()
+    total_programs = sum(len(f['programs']) for f in faculties)
     programs = [
         {'title': 'Studia inżynierskie I stopnia', 'description': 'Programy kształcenia obejmujące podstawy informatyki, automatyki oraz inżynierii.', 'level': '1. stopień'},
         {'title': 'Studia magisterskie II stopnia', 'description': 'Sylabusy dla kierunków technicznych i menedżerskich z naciskiem na praktyczne projekty.', 'level': '2. stopień'},
@@ -109,6 +125,8 @@ def index(request):
     return render(request, 'sylabusy/index.html', {
         'programs': programs,
         'faculties': faculties,
+        'total_programs': total_programs,
+        'total_faculties': len(faculties),
         'university': 'Politechnika Białostocka',
     })
 
