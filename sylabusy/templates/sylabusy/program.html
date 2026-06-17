@@ -75,7 +75,7 @@
                             <tbody>
                                 {% for subject in semester.subjects %}
                                     <tr>
-                                        <td>{{ subject.name }}</td>
+                                        <td><a class="program-link is-subject" href="{% url 'subject_detail' faculty.slug program.slug subject.id %}">{{ subject.name }}</a></td>
                                         <td>{{ subject.hours }}</td>
                                         <td>{{ subject.ects }}</td>
                                         <td>{{ subject.form }}</td>

@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject.nazwa }} - {{ university }}</title>
+    <link rel="stylesheet" href="{% static 'sylabusy/style.css' %}">
+    <script src="{% static 'sylabusy/theme.js' %}"></script>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a class="brand" href="/">Sylabusy Uczelni</a>
+            <nav>
+                <ul>
+                    <li><a href="/">Strona główna</a></li>
+                    <li><a href="{% url 'faculty_detail' faculty.slug %}">{{ faculty.name }}</a></li>
+                </ul>
+            </nav>
+            <div class="theme-switcher">
+                <button class="theme-btn" data-theme="light" onclick="setTheme('light')">Jasny</button>
+                <button class="theme-btn" data-theme="dark" onclick="setTheme('dark')">Ciemny</button>
+                <button class="theme-btn" data-theme="contrast" onclick="setTheme('contrast')">Kontrast</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="breadcrumb">
+                <a href="/">Strona główna</a> ›
+                <a href="{% url 'faculty_detail' faculty.slug %}">{{ faculty.name }}</a> ›
+                <a href="{% url 'program_detail' faculty.slug program.slug %}">{{ program.title }}</a> ›
+                <span>{{ subject.nazwa }}</span>
+            </div>
+
+            <h2 class="section-title">{{ subject.nazwa }}</h2>
+
+            <div class="subject-card">
+                <h3 class="subject-card-title">Informacje podstawowe</h3>
+                <dl class="subject-grid">
+                    <div class="subject-row">
+                        <dt>Kierunek studiów</dt>
+                        <dd>{{ subject.kierunek }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Specjalność</dt>
+                        <dd>{{ subject.specjalnosc }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Jednostka organizacyjna</dt>
+                        <dd>{{ subject.jednostka }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Poziom kształcenia</dt>
+                        <dd>{{ subject.poziom }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Forma studiów</dt>
+                        <dd>{{ subject.forma }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Profil studiów</dt>
+                        <dd>{{ subject.profil }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Cykl dydaktyczny</dt>
+                        <dd>{{ subject.cykl }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Kod przedmiotu</dt>
+                        <dd>{{ subject.kod }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Obligatoryjność</dt>
+                        <dd>{{ subject.obligatoryjnosc }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Blok zajęciowy</dt>
+                        <dd>{{ subject.blok }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Koordynator przedmiotu</dt>
+                        <dd>{{ subject.koordynator }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Prowadzący zajęcia</dt>
+                        <dd>{{ subject.prowadzacy }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Okres</dt>
+                        <dd>Semestr {{ subject.semestr }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Forma zaliczenia</dt>
+                        <dd>{{ subject.forma_zaliczenia }}</dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Forma prowadzenia i godziny zajęć</dt>
+                        <dd>
+                            {% for g in subject.godziny %}
+                                {{ g }}{% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </dd>
+                    </div>
+                    <div class="subject-row">
+                        <dt>Liczba punktów ECTS</dt>
+                        <dd>{{ subject.ects }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            {% if subject.zalozenia %}
+            <div class="subject-card">
+                <h3 class="subject-card-title">Cele przedmiotu</h3>
+                <p class="program-description">{{ subject.zalozenia }}</p>
+            </div>
+            {% endif %}
+
+            {% if subject.tresci %}
+            <div class="subject-card">
+                <h3 class="subject-card-title">Treści programowe</h3>
+                <p class="program-description">{{ subject.tresci }}</p>
+            </div>
+            {% endif %}
+
+            {% if subject.literatura_podstawowa or subject.literatura_uzupelniajaca %}
+            <div class="subject-card">
+                <h3 class="subject-card-title">Literatura</h3>
+                {% if subject.literatura_podstawowa %}
+                    <p class="program-description"><strong>Podstawowa:</strong> {{ subject.literatura_podstawowa }}</p>
+                {% endif %}
+                {% if subject.literatura_uzupelniajaca %}
+                    <p class="program-description"><strong>Uzupełniająca:</strong> {{ subject.literatura_uzupelniajaca }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>Akademicki system sylabusowy dla {{ university }}.</p>
+            <p><a href="{% url 'program_detail' faculty.slug program.slug %}">Powrót do kierunku</a></p>
+        </div>
+    </footer>
+</body>
+</html>

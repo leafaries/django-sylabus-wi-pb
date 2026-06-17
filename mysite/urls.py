@@ -1,6 +1,5 @@
 """
 URL configuration for mysite project.
-
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/6.0/topics/http/urls/
 Examples:
@@ -16,7 +15,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
 from sylabusy import views
 
 urlpatterns = [
@@ -24,4 +22,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('wydzial/<slug:slug>/', views.faculty_detail, name='faculty_detail'),
     path('wydzial/<slug:faculty_slug>/<slug:program_slug>/', views.program_detail, name='program_detail'),
+    path('wydzial/<slug:faculty_slug>/<slug:program_slug>/przedmiot/<int:przedmiot_id>/', views.subject_detail, name='subject_detail'),
 ]
