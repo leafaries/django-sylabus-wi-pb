@@ -20,7 +20,8 @@ from sylabusy import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('wydzial/<slug:slug>/', views.faculty_detail, name='faculty_detail'),
-    path('wydzial/<slug:faculty_slug>/<slug:program_slug>/', views.program_detail, name='program_detail'),
-    path('wydzial/<slug:faculty_slug>/<slug:program_slug>/przedmiot/<int:przedmiot_id>/', views.subject_detail, name='subject_detail'),
+    path('kierunek/<slug:slug>/', views.faculty_detail, name='faculty_detail'),
+    path('kierunek/<slug:faculty_slug>/<slug:program_slug>/', views.program_detail, name='program_detail'),
+    path('kierunek/<slug:faculty_slug>/<slug:program_slug>/przedmiot/<int:przedmiot_id>/', views.subject_detail, name='subject_detail'),
+    path('kierunek/<slug:faculty_slug>/<slug:program_slug>/przedmiot/<int:przedmiot_id>/pdf/', views.subject_pdf, name='subject_pdf'),
 ]

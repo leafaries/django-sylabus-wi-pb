@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ subject.nazwa }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm 2cm 2.5cm;
+            @bottom-right {
+                content: "Strona " counter(page) " z " counter(pages);
+                font-size: 8pt;
+                color: #888;
+            }
+        }
+        * {
+            font-family: DejaVu Sans, sans-serif;
+        }
+        body {
+            font-size: 10pt;
+            color: #111;
+            margin: 0;
+            padding: 0;
+        }
+        .header-institution {
+            font-size: 13pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 3pt;
+        }
+        .header-sub {
+            font-size: 10pt;
+            text-align: center;
+            margin-bottom: 12pt;
+            color: #555;
+        }
+        .divider {
+            border: none;
+            border-top: 1.5px solid #222;
+            margin: 0 0 12pt;
+        }
+        .subject-title {
+            font-size: 15pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 4pt;
+        }
+        .subject-meta {
+            font-size: 9pt;
+            text-align: center;
+            margin-bottom: 16pt;
+            color: #555;
+        }
+        table.info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14pt;
+        }
+        table.info-table tr {
+            border-bottom: 1px solid #ddd;
+        }
+        table.info-table td.label {
+            font-weight: bold;
+            width: 44%;
+            padding: 3pt 6pt;
+            vertical-align: top;
+            font-size: 9pt;
+            background-color: #f5f5f5;
+        }
+        table.info-table td.value {
+            padding: 3pt 6pt;
+            vertical-align: top;
+            font-size: 9pt;
+        }
+        .section-heading {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-top: 14pt;
+            margin-bottom: 5pt;
+            padding-bottom: 2pt;
+            border-bottom: 1px solid #444;
+        }
+        .section-text {
+            font-size: 9pt;
+            line-height: 1.5;
+            margin: 0 0 6pt;
+        }
+        .footer-note {
+            font-size: 7pt;
+            color: #aaa;
+            text-align: center;
+            margin-top: 20pt;
+            border-top: 1px solid #ddd;
+            padding-top: 4pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-institution">Politechnika Białostocka</div>
+    <div class="header-sub">Wydział Informatyki</div>
+    <hr class="divider">
+    <div class="subject-title">{{ subject.nazwa }}</div>
+    <div class="subject-meta">
+        {{ subject.kierunek }}{% if subject.specjalnosc and subject.specjalnosc != '-' %}, spec. {{ subject.specjalnosc }}{% endif %} &bull; {{ subject.poziom }} &bull; {{ subject.forma }}
+    </div>
+
+    <table class="info-table">
+        <tr>
+            <td class="label">Kierunek studiów</td>
+            <td class="value">{{ subject.kierunek }}</td>
+        </tr>
+        <tr>
+            <td class="label">Specjalność</td>
+            <td class="value">{{ subject.specjalnosc }}</td>
+        </tr>
+        <tr>
+            <td class="label">Jednostka organizacyjna</td>
+            <td class="value">{{ subject.jednostka }}</td>
+        </tr>
+        <tr>
+            <td class="label">Poziom kształcenia</td>
+            <td class="value">{{ subject.poziom }}</td>
+        </tr>
+        <tr>
+            <td class="label">Forma studiów</td>
+            <td class="value">{{ subject.forma }}</td>
+        </tr>
+        <tr>
+            <td class="label">Profil studiów</td>
+            <td class="value">{{ subject.profil }}</td>
+        </tr>
+        <tr>
+            <td class="label">Cykl dydaktyczny</td>
+            <td class="value">{{ subject.cykl }}</td>
+        </tr>
+        <tr>
+            <td class="label">Kod przedmiotu</td>
+            <td class="value">{{ subject.kod }}</td>
+        </tr>
+        <tr>
+            <td class="label">Obligatoryjność</td>
+            <td class="value">{{ subject.obligatoryjnosc }}</td>
+        </tr>
+        <tr>
+            <td class="label">Blok zajęciowy</td>
+            <td class="value">{{ subject.blok }}</td>
+        </tr>
+        <tr>
+            <td class="label">Koordynator przedmiotu</td>
+            <td class="value">{{ subject.koordynator }}</td>
+        </tr>
+        <tr>
+            <td class="label">Prowadzący zajęcia</td>
+            <td class="value">{{ subject.prowadzacy }}</td>
+        </tr>
+        <tr>
+            <td class="label">Okres</td>
+            <td class="value">Semestr {{ subject.semestr }}</td>
+        </tr>
+        <tr>
+            <td class="label">Forma zaliczenia</td>
+            <td class="value">{{ subject.forma_zaliczenia }}</td>
+        </tr>
+        {% if subject.godziny %}
+        <tr>
+            <td class="label">Forma prowadzenia i godziny zajęć</td>
+            <td class="value">{% for g in subject.godziny %}{{ g }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td class="label">Liczba punktów ECTS</td>
+            <td class="value">{{ subject.ects }}</td>
+        </tr>
+    </table>
+
+    {% if subject.zalozenia %}
+    <div class="section-heading">Cele przedmiotu</div>
+    <div class="section-text">{{ subject.zalozenia }}</div>
+    {% endif %}
+
+    {% if subject.tresci %}
+    <div class="section-heading">Treści programowe</div>
+    <div class="section-text">{{ subject.tresci }}</div>
+    {% endif %}
+
+    {% if subject.literatura_podstawowa or subject.literatura_uzupelniajaca %}
+    <div class="section-heading">Literatura</div>
+    {% if subject.literatura_podstawowa %}
+    <div class="section-text"><strong>Podstawowa:</strong> {{ subject.literatura_podstawowa }}</div>
+    {% endif %}
+    {% if subject.literatura_uzupelniajaca %}
+    <div class="section-text"><strong>Uzupełniająca:</strong> {{ subject.literatura_uzupelniajaca }}</div>
+    {% endif %}
+    {% endif %}
+
+    <div class="footer-note">Wygenerowano przez Sylabusy WI PB &mdash; Politechnika Białostocka, Wydział Informatyki</div>
+</body>
+</html>

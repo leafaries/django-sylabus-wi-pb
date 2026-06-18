@@ -1,5 +1,8 @@
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
+from weasyprint import HTML
+
 from .models import (
     SwierkappKierunek, SwierkappStudia, SwierkappPrzedmiot,
     SwierkappKarta, SwierkappPrzedmiotKoordynatorzy, SwierkappKartaProwadzacy,
@@ -32,10 +35,16 @@ def _build_faculties():
         ).select_related('specjalnosc')
 
         programs = []
+        # seen_programs = set()
         for studia in studia_list:
             stopien = STOPIEN_MAP.get(studia.stopien, studia.stopien)
             forma = FORMA_MAP.get(studia.forma or '', studia.forma or 'Stacjonarne')
             specjalnosc = studia.specjalnosc.nazwa if studia.specjalnosc.nazwa != '---' else ''
+
+            dedup_key = (studia.specjalnosc_id, studia.stopien, studia.forma)
+            # if dedup_key in seen_programs:
+            #     continue
+            # seen_programs.add(dedup_key)
 
             if specjalnosc:
                 title = f'{kierunek.nazwa}, spec. {specjalnosc}'
@@ -46,6 +55,8 @@ def _build_faculties():
             description = f'{title} – {studia.liczba_semestrow} semestrów'
 
             semesters = _build_semesters(studia)
+            if not semesters:
+                continue
             programs.append({
                 'title': title,
                 'slug': str(studia.id),
@@ -58,10 +69,13 @@ def _build_faculties():
                 'forma_badge': FORMA_MAP.get(studia.forma or '', 'Stacjonarne'),
             })
 
+        if not programs:
+            continue
+
         faculties.append({
             'slug': str(kierunek.id),
             'name': kierunek.nazwa,
-            'description': f'Kierunek: {kierunek.nazwa}',  # change this
+            'description': f'Kierunek: {kierunek.nazwa}',
             'programs': programs,
         })
     return faculties
@@ -75,13 +89,19 @@ def _build_semesters(studia):
         studia=studia,
         abstrakcyjny=False,
         publiczne=True,
-    ).order_by('-poczatek__rok_akademicki').first()
+    ).exclude(opis__icontains='erasmus').order_by('-poczatek__rok_akademicki').first()
 
     if not cykl:
         return []
 
+    # Collect cykl IDs to pull subjects from: the concrete cykl + its abstract parent (rdzeń)
+    # Programs with specializations store shared semesters (1-4) in an abstract cykl_nadrzedny
+    cykl_ids = [cykl.id]
+    if cykl.cykl_nadrzedny_id:
+        cykl_ids.append(cykl.cykl_nadrzedny_id)
+
     przedmioty = SwierkappPrzedmiot.objects.filter(
-        cykl=cykl
+        cykl_id__in=cykl_ids
     ).select_related('nazwa', 'kategoria').order_by('sem', 'nazwa__nazwa')
 
     SPECIAL_SEMESTERS = {
@@ -159,22 +179,7 @@ def program_detail(request, faculty_slug, program_slug):
     })
 
 
-def subject_detail(request, faculty_slug, program_slug, przedmiot_id):
-    faculty = next((f for f in _build_faculties() if f['slug'] == faculty_slug), None)
-    if not faculty:
-        raise Http404('Wydział nie znaleziony')
-    program = next((p for p in faculty['programs'] if p['slug'] == program_slug), None)
-    if not program:
-        raise Http404('Kierunek nie znaleziony')
-
-    try:
-        p = SwierkappPrzedmiot.objects.select_related(
-            'nazwa', 'jednostka', 'kategoria', 'cykl', 'cykl__studia',
-            'cykl__studia__kierunek', 'cykl__studia__specjalnosc',
-        ).get(id=przedmiot_id)
-    except SwierkappPrzedmiot.DoesNotExist:
-        raise Http404('Przedmiot nie znaleziony')
-
+def _build_subject(przedmiot_id):
     STOPIEN_MAP = {
         'I': 'Studia inżynierskie I stopnia',
         'II': 'Studia magisterskie II stopnia',
@@ -184,6 +189,14 @@ def subject_detail(request, faculty_slug, program_slug, przedmiot_id):
         'st.': 'Stacjonarne',
         'niest.': 'Niestacjonarne',
     }
+
+    try:
+        p = SwierkappPrzedmiot.objects.select_related(
+            'nazwa', 'jednostka', 'kategoria', 'cykl', 'cykl__studia',
+            'cykl__studia__kierunek', 'cykl__studia__specjalnosc',
+        ).get(id=przedmiot_id)
+    except SwierkappPrzedmiot.DoesNotExist:
+        raise Http404('Przedmiot nie znaleziony')
 
     studia = p.cykl.studia
     stopien = STOPIEN_MAP.get(studia.stopien, studia.stopien)
@@ -226,7 +239,7 @@ def subject_detail(request, faculty_slug, program_slug, przedmiot_id):
     if p.liczba_godzin_s:
         godziny.append(f'Seminarium: {p.liczba_godzin_s}')
 
-    subject = {
+    return {
         'nazwa': p.nazwa.nazwa,
         'kierunek': studia.kierunek.nazwa,
         'specjalnosc': specjalnosc,
@@ -250,9 +263,45 @@ def subject_detail(request, faculty_slug, program_slug, przedmiot_id):
         'literatura_uzupelniajaca': karta.literatura_uzupelniajaca if karta else '',
     }
 
+
+def subject_detail(request, faculty_slug, program_slug, przedmiot_id):
+    faculty = next((f for f in _build_faculties() if f['slug'] == faculty_slug), None)
+    if not faculty:
+        raise Http404('Wydział nie znaleziony')
+    program = next((p for p in faculty['programs'] if p['slug'] == program_slug), None)
+    if not program:
+        raise Http404('Kierunek nie znaleziony')
+
+    subject = _build_subject(przedmiot_id)
+
     return render(request, 'sylabusy/subject.html', {
         'faculty': faculty,
         'program': program,
         'subject': subject,
+        'przedmiot_id': przedmiot_id,
         'university': 'Politechnika Białostocka',
     })
+
+
+def subject_pdf(request, faculty_slug, program_slug, przedmiot_id):
+    faculty = next((f for f in _build_faculties() if f['slug'] == faculty_slug), None)
+    if not faculty:
+        raise Http404('Wydział nie znaleziony')
+    program = next((p for p in faculty['programs'] if p['slug'] == program_slug), None)
+    if not program:
+        raise Http404('Kierunek nie znaleziony')
+
+    subject = _build_subject(przedmiot_id)
+    html_string = render_to_string('sylabusy/subject_pdf.html', {
+        'faculty': faculty,
+        'program': program,
+        'subject': subject,
+        'university': 'Politechnika Białostocka',
+    }, request=request)
+
+    pdf = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
+
+    safe_name = subject['nazwa'].replace(' ', '_').replace('/', '-')[:60]
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{safe_name}.pdf"'
+    return response

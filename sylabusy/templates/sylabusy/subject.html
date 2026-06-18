@@ -11,7 +11,7 @@
 <body>
     <header>
         <div class="header-inner">
-            <a class="brand" href="/">Sylabusy Uczelni</a>
+            <a class="brand" href="/">Sylabusy WI PB</a>
             <nav>
                 <ul>
                     <li><a href="/">Strona główna</a></li>
@@ -35,7 +35,10 @@
                 <span>{{ subject.nazwa }}</span>
             </div>
 
-            <h2 class="section-title">{{ subject.nazwa }}</h2>
+            <div class="subject-page-header">
+                <h2 class="section-title">{{ subject.nazwa }}</h2>
+                <a class="pdf-btn" href="{% url 'subject_pdf' faculty.slug program.slug przedmiot_id %}">Pobierz PDF</a>
+            </div>
 
             <div class="subject-card">
                 <h3 class="subject-card-title">Informacje podstawowe</h3>
@@ -96,6 +99,7 @@
                         <dt>Forma zaliczenia</dt>
                         <dd>{{ subject.forma_zaliczenia }}</dd>
                     </div>
+                    {% if subject.godziny %}
                     <div class="subject-row">
                         <dt>Forma prowadzenia i godziny zajęć</dt>
                         <dd>
@@ -104,6 +108,7 @@
                             {% endfor %}
                         </dd>
                     </div>
+                    {% endif %}
                     <div class="subject-row">
                         <dt>Liczba punktów ECTS</dt>
                         <dd>{{ subject.ects }}</dd>

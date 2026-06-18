@@ -10,12 +10,11 @@
 <body>
     <header>
         <div class="header-inner">
-            <a class="brand" href="/">Sylabusy Uczelni</a>
+            <a class="brand" href="/">Sylabusy WI PB</a>
             <nav>
                 <ul>
                     <li><a href="#programs">Programy</a></li>
                     <li><a href="#kierunki">Kierunki</a></li>
-                    <li><a href="#faculties">Wydziały</a></li>
                     <li><a href="#contact">Kontakt</a></li>
                 </ul>
             </nav>
@@ -31,7 +30,7 @@
         <section class="main-hero">
             <div class="section">
                 <h1>Przeglądaj sylabusy i programy studiów</h1>
-                <p>Łatwy dostęp do podstawy programowej, wydziałów i typów studiów. Przygotuj plan na nowy rok akademicki dla {{ university }}.</p>
+                <p>Łatwy dostęp do sylabusów, kierunków i programów studiów Wydziału Informatyki {{ university }}.</p>
             </div>
         </section>
 
@@ -41,16 +40,16 @@
                     <span class="stat-number">{{ total_programs }}</span>
                     <span class="stat-label">kierunków</span>
                 </div>
-                <div class="stat-divider"></div>
-                <div class="stat">
-                    <span class="stat-number">{{ total_faculties }}</span>
-                    <span class="stat-label">wydziałów</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat">
-                    <span class="stat-number">3</span>
-                    <span class="stat-label">stopnie studiów</span>
-                </div>
+<!--                <div class="stat-divider"></div>-->
+<!--                <div class="stat">-->
+<!--                    <span class="stat-number">{{ total_faculties }}</span>-->
+<!--                    <span class="stat-label">kierunków</span>-->
+<!--                </div>-->
+<!--                <div class="stat-divider"></div>-->
+<!--                <div class="stat">-->
+<!--                    <span class="stat-number">3</span>-->
+<!--                    <span class="stat-label">stopnie studiów</span>-->
+<!--                </div>-->
             </div>
         </div>
 
@@ -117,17 +116,6 @@
             </div>
         </section>
 
-        <section class="section" id="faculties">
-            <h2 class="section-title">Wydziały</h2>
-            <div class="list-box">
-                {% for faculty in faculties %}
-                <a class="list-item" href="{% url 'faculty_detail' faculty.slug %}">
-                    <h4>{{ faculty.name }}</h4>
-                    <span>{{ faculty.description }}</span>
-                </a>
-                {% endfor %}
-            </div>
-        </section>
     </main>
 
     <footer class="footer" id="contact">

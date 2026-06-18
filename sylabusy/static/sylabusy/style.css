@@ -811,3 +811,55 @@ body > * {
     font-size: 0.85rem;
     color: var(--text-small);
 }
+
+/* =====================
+   Nagłówek karty przedmiotu z przyciskiem PDF
+   ===================== */
+
+.subject-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+
+.subject-page-header .section-title {
+    margin-bottom: 0;
+}
+
+.pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.pdf-btn::before {
+    content: "⬇";
+    font-size: 0.85rem;
+}
+
+.pdf-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+[data-theme="contrast"] .pdf-btn {
+    background: #ffff00;
+    color: #000000;
+}
+
